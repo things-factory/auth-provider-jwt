@@ -1,0 +1,18 @@
+{
+  "name": "@things-factory/auth-provider-jwt",
+  "version": "0.0.1",
+  "main": "src/index.js",
+  "things-factory": true,
+  "license": "MIT",
+  "author": "heartyoh",
+  "scripts": {
+    "build:dev": "webpack --config ./node_modules/@things-factory/shell/webpack.config.dev.js",
+    "serve:dev": "webpack-dev-server --config ./node_modules/@things-factory/shell/webpack.config.dev.js"
+  },
+  "dependencies": {
+    "@things-factory/shell": "*"
+  },
+  "devDependencies": {
+    "@things-factory/tester": "*"
+  }
+}
