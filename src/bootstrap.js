@@ -1,47 +1,8 @@
-import { store, auth, HOMEPAGE, updateAuthenticated, showSnackbar, updateUser } from '@things-factory/shell'
+import { store, auth, HOMEPAGE } from '@things-factory/shell'
 
 import JWTAuthProvider from './jwt-auth-provider'
 
-function onProfileChanged(e) {
-  store.dispatch(updateUser(e.detail.profile))
-}
-
-function onAuthenticatedChanged(e) {
-  var auth = e.detail
-  store.dispatch(updateAuthenticated(auth))
-}
-
-function onAuthErrorChanged(e) {
-  store.dispatch(showSnackbar(e.detail))
-}
-
 export default function bootstrap() {
-  auth.on('signin', accessToken => {
-    dispatchEvent(
-      new CustomEvent('authenticated-changed', {
-        bubbles: true,
-        composed: true,
-        detail: { authenticated: true, accessToken }
-      })
-    )
-  })
-
-  auth.on('signout', () => {
-    document.dispatchEvent(
-      new CustomEvent('authenticated-changed', { bubbles: true, composed: true, detail: { authenticated: false } })
-    )
-  })
-
-  auth.on('profile', profile => {
-    document.dispatchEvent(new CustomEvent('profile-changed', { bubbles: true, composed: true, detail: { profile } }))
-  })
-
-  auth.on('error', error => {
-    console.error(error)
-
-    document.dispatchEvent(new CustomEvent('auth-error-changed', { bubbles: true, composed: true, detail: { error } }))
-  })
-
   store.subscribe(() => {
     var state = store.getState()
 
@@ -70,8 +31,4 @@ export default function bootstrap() {
 
   auth.contextPath = ''
   auth.defaultRoutePage = HOMEPAGE
-
-  document.addEventListener('profile-changed', onProfileChanged)
-  document.addEventListener('authenticated-changed', onAuthenticatedChanged)
-  document.addEventListener('auth-error-changed', onAuthErrorChanged)
 }
