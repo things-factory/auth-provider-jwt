@@ -1,4 +1,4 @@
-import { sleep, deleteCookie } from '@things-shell/client-utils'
+import { sleep, deleteCookie } from '@things-factory/shell'
 
 export default {
   signinPath: 'signin',
