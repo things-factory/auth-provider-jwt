@@ -1,4 +1,21 @@
-import { sleep, deleteCookie } from '@things-factory/shell'
+import { sleep, deleteCookie, encodeFormParams } from '@things-factory/shell'
+
+async function encodeSha256(password) {
+  const encoder = new TextEncoder()
+  const encoded = encoder.encode(password)
+
+  const buffer = await crypto.subtle.digest('SHA-256', encoded)
+  return hexString(buffer)
+}
+
+function _matchPass(newPassword, confirmPassword, currentPassword) {
+  if (newPassword !== confirmPassword) {
+    debugger
+    throw 'Your password is not matched'
+  } else if (newPassword === currentPassword) {
+    throw 'You are using old password'
+  }
+}
 
 export default {
   signinPath: 'signin',
@@ -7,6 +24,49 @@ export default {
   signoutPath: '',
   signinPage: 'signin',
   signupPage: 'signup',
+  changepassPath: 'users/change_pass',
+
+  //run after the base connect this provider function
+  async changePassword(formProps) {
+    var newPassword = formProps.new_pass
+    var confirmPassword = formProps.confirm_pass
+    var currentPassword = formProps.current_pass
+
+    try {
+      _matchPass(newPassword, confirmPassword, currentPassword)
+
+      formProps.new_pass = await encodeSha256(newPassword)
+      formProps.confirm_pass = await encodeSha256(confirmPassword)
+      formProps.current_pass = await encodeSha256(currentPassword)
+
+      const response = await fetch(this.fullpath(`${this.changepassPath}/admin`), {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify(formProps)
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+
+        if (data && data.error) {
+          this.onChangePwdError(data.error)
+          return
+        }
+        if (data && data.token) {
+          this.onPwdChanged(data.token)
+          return
+        }
+      } else {
+        throw new Error(response.status)
+      }
+    } catch (e) {
+      this.onChangePwdError(e)
+    }
+  },
 
   async signup(formProps) {
     try {
