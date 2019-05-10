@@ -54,11 +54,8 @@ export default {
 
         if (data && data.error) {
           this.onChangePwdError(data.error)
-          return
-        }
-        if (data && data.token) {
-          this.onPwdChanged(data.token)
-          return
+        } else {
+          this.onPwdChanged(true)
         }
       } else {
         throw new Error(response.status)
