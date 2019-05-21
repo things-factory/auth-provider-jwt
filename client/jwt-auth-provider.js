@@ -1,12 +1,12 @@
 import { sleep, deleteCookie, encodeFormParams } from '@things-factory/shell'
 
-async function encodeSha256(password) {
-  const encoder = new TextEncoder()
-  const encoded = encoder.encode(password)
+// async function encodeSha256(password) {
+//   const encoder = new TextEncoder()
+//   const encoded = encoder.encode(password)
 
-  const buffer = await crypto.subtle.digest('SHA-256', encoded)
-  return hexString(buffer)
-}
+//   const buffer = await crypto.subtle.digest('SHA-256', encoded)
+//   return hexString(buffer)
+// }
 
 function _matchPass(newPassword, confirmPassword, currentPassword) {
   if (newPassword !== confirmPassword) {
@@ -24,7 +24,7 @@ export default {
   signoutPath: '',
   signinPage: 'signin',
   signupPage: 'signup',
-  changepassPath: 'users/change_pass',
+  changepassPath: 'change_pass',
 
   //run after the base connect this provider function
   async changePassword(formProps) {
@@ -35,11 +35,11 @@ export default {
     try {
       _matchPass(newPassword, confirmPassword, currentPassword)
 
-      formProps.new_pass = await encodeSha256(newPassword)
-      formProps.confirm_pass = await encodeSha256(confirmPassword)
-      formProps.current_pass = await encodeSha256(currentPassword)
+      // formProps.new_pass = await encodeSha256(newPassword)
+      // formProps.confirm_pass = await encodeSha256(confirmPassword)
+      // formProps.current_pass = await encodeSha256(currentPassword)
 
-      const response = await fetch(this.fullpath(`${this.changepassPath}/admin`), {
+      const response = await fetch(this.fullpath(`${this.changepassPath}`), {
         method: 'POST',
         credentials: 'include',
         headers: {
