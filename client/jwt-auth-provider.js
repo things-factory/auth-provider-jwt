@@ -135,12 +135,17 @@ export default {
 
   async profile() {
     try {
+      var searchParams = new URLSearchParams(location.search)
+      var token = searchParams.get('token')
+      var headers = {
+        'Content-Type': 'application/json'
+      }
+
+      if (token) headers.authorization = `Bearer ${token}`
       const response = await fetch(this.fullpath(this.profilePath), {
         method: 'GET',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        headers
       })
 
       if (response.ok) {
