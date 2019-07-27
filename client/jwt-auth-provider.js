@@ -1,4 +1,4 @@
-import { sleep, deleteCookie, encodeFormParams } from '@things-factory/shell'
+import { sleep, deleteCookie } from '@things-factory/shell'
 
 // async function encodeSha256(password) {
 //   const encoder = new TextEncoder()
@@ -175,7 +175,7 @@ export default {
     // localStorage.removeItem('user')
 
     deleteCookie('access_token')
-    await sleep(1000)
+    await sleep(500)
     this.onSignedOut('signed out')
   }
 }
