@@ -10,7 +10,6 @@ export default function bootstrap() {
     var baseUrl = state.app.baseUrl
 
     auth.contextPath = state.app.contextPath
-    auth.defaultRoutePage = state.route.defaultRoutePage
 
     if (baseUrl && baseUrl !== auth.endpoint) {
       auth.endpoint = baseUrl
