@@ -20,7 +20,7 @@ export default {
   signinPath: 'signin',
   signupPath: 'signup',
   profilePath: 'authcheck',
-  signoutPath: '',
+  signoutPath: 'signout',
   signinPage: 'signin',
   signupPage: 'signup',
   changepassPath: 'change_pass',
@@ -170,11 +170,24 @@ export default {
   },
 
   async signout() {
-    // localStorage.removeItem('access_token')
-    // localStorage.removeItem('user')
+    try {
+      const response = await fetch(this.fullpath(this.signoutPath), {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
 
-    deleteCookie('access_token')
-    await sleep(500)
-    this.onSignedOut('signed out')
+      if (response.ok) {
+        const data = await response.json()
+        this.onSignedOut('signed out')
+        return
+      } else {
+        throw new Error(response.status)
+      }
+    } catch (e) {
+      this.onAuthError(e)
+    }
   }
 }

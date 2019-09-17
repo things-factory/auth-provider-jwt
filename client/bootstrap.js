@@ -23,7 +23,7 @@ export default function bootstrap() {
   auth.signinPath = 'signin'
   auth.signupPath = 'signup'
   auth.profilePath = 'authcheck'
-  auth.signoutPath = ''
+  auth.signoutPath = 'signout'
 
   auth.signinPage = 'signin'
   auth.signupPage = 'signup'
