@@ -1,5 +1,3 @@
-import { sleep, deleteCookie } from '@things-factory/shell'
-
 // async function encodeSha256(password) {
 //   const encoder = new TextEncoder()
 //   const encoded = encoder.encode(password)
