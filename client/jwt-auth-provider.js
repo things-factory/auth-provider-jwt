@@ -87,7 +87,10 @@ export default {
            data.token 이 전달되면, 서버는 특별한 확인과정없이 사용자 승인한 것으로 이해하고, 바로 자동 로그인 절차에 들어간다.
            즉, 사용자 auth dispatch 후에 바로 사용자 정보를 서버에 요청한다.
           */
-          this.onSignedIn(data.token)
+          this.onSignedIn({
+            accessToken: data.token,
+            domains: data.domains
+          })
           this.profile()
           return
         } else {
@@ -118,7 +121,10 @@ export default {
         // localStorage.setItem('access_token', data.token)
 
         /* 사용자 auth dispatch 후에 바로 사용자 정보를 서버에 요청함. */
-        this.onSignedIn(data.token)
+        this.onSignedIn({
+          accessToken: data.token,
+          domains: data.domains
+        })
         this.profile()
 
         return
@@ -151,13 +157,23 @@ export default {
         // localStorage.setItem('user', JSON.stringify(data.user))
         // localStorage.setItem('access_token', data.token)
 
-        this.onProfileFetched(data.user, data.token)
+        this.onProfileFetched({
+          credential: data.user,
+          accessToken: data.token,
+          domains: data.domains
+        })
 
         return
       } else {
         let status = Number(response.status)
         if (status == 401) {
           this.onAuthRequired(response.status)
+          return
+        }
+        if (status == 406) {
+          response.json().then(json => {
+            this.onDomainNotAvailable(json)
+          })
           return
         }
         throw new Error(response)
