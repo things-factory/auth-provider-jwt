@@ -129,6 +129,10 @@ export default {
 
         return
       } else {
+        let status = Number(response.status)
+        if (status == 401) {
+          this.onActivateRequired(response.status)
+        }
         throw new Error(response.status)
       }
     } catch (e) {
