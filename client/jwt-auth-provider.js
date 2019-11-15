@@ -129,10 +129,6 @@ export default {
 
         return
       } else {
-        let status = Number(response.status)
-        if (status == 401) {
-          this.onActivateRequired(response.status)
-        }
         throw new Error(response.status)
       }
     } catch (e) {
@@ -171,7 +167,17 @@ export default {
       } else {
         let status = Number(response.status)
         if (status == 401) {
-          this.onAuthRequired(response.status)
+          var {
+            message,
+            email
+          } = await response.json()
+          if(message == 'user-not-activated') {
+            this.onActivateRequired({
+              email
+            })
+          } else {
+            this.onAuthRequired(response.status)
+          }
           return
         }
         if (status == 406) {
