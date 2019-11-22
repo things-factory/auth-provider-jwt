@@ -19,9 +19,43 @@ export default {
   signupPath: 'signup',
   profilePath: 'authcheck',
   signoutPath: 'signout',
+  changepassPath: 'change_pass',
+  updateProfilePath: 'update-profile',
   signinPage: 'signin',
   signupPage: 'signup',
-  changepassPath: 'change_pass',
+
+  //run after the base connect this provider function
+  async updateProfile(formProps) {
+    try {
+      const response = await fetch(this.fullpath(`${this.updateProfilePath}`), {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify(formProps)
+      })
+
+      const data = await response.json()
+      if (response.ok) {
+        return {
+          success: true,
+          detail: data
+        }
+      } else {
+        return {
+          success: false,
+          detail: data
+        }
+      }
+    } catch (e) {
+      return {
+        success: false,
+        detail: e
+      }
+    }
+  },
 
   //run after the base connect this provider function
   async changePassword(formProps) {
