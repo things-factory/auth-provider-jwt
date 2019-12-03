@@ -140,13 +140,8 @@ export default {
         body: JSON.stringify(formProps)
       })
 
+      const data = await response.json()
       if (response.ok) {
-        const data = await response.json()
-
-        if (data && data.error) {
-          this.onAuthError(data.error)
-          return
-        }
         if (data && data.token) {
           // localStorage.setItem('access_token', data.token)
 
@@ -161,13 +156,22 @@ export default {
           this.profile()
           return
         } else {
-          throw new Error(response.status)
+          this.onAuthError({
+            success: false,
+            detail: data
+          })
         }
       } else {
-        throw new Error(response.status)
+        this.onAuthError({
+          success: false,
+          detail: data
+        })
       }
     } catch (e) {
-      this.onAuthError(e)
+      this.onAuthError({
+        success: false,
+        detail: e
+      })
     }
   },
 
@@ -226,9 +230,8 @@ export default {
         headers
       })
 
+      const data = await response.json()
       if (response.ok) {
-        const data = await response.json()
-
         // localStorage.setItem('user', JSON.stringify(data.user))
         // localStorage.setItem('access_token', data.token)
 
@@ -258,10 +261,16 @@ export default {
           })
           return
         }
-        throw new Error(response)
+        this.onAuthError({
+          success: false,
+          detail: data
+        })
       }
     } catch (e) {
-      this.onAuthError(e)
+      this.onAuthError({
+        success: false,
+        detail: e
+      })
     }
   },
 
