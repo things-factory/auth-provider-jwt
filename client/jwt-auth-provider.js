@@ -21,6 +21,7 @@ export default {
   signoutPath: 'signout',
   changepassPath: 'change_pass',
   updateProfilePath: 'update-profile',
+  deleteAccountPath: 'delete-account',
   signinPage: 'signin',
   signupPage: 'signup',
 
@@ -96,6 +97,38 @@ export default {
     }
   },
 
+  async deleteAccount(formProps) {
+    try {
+      const response = await fetch(this.fullpath(`${this.deleteAccountPath}`), {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify(formProps)
+      })
+
+      const data = await response.json()
+      if (response.ok) {
+        return {
+          success: true,
+          detail: data
+        }
+      } else {
+        return {
+          success: false,
+          detail: data
+        }
+      }
+    } catch (e) {
+      return {
+        success: false,
+        detail: e
+      }
+    }
+  },
+
   async signup(formProps) {
     try {
       const response = await fetch(this.fullpath(this.signupPath), {
@@ -149,9 +182,8 @@ export default {
         body: JSON.stringify(formProps)
       })
 
+      const data = await response.json()
       if (response.ok) {
-        const data = await response.json()
-
         // localStorage.setItem('access_token', data.token)
 
         /* 사용자 auth dispatch 후에 바로 사용자 정보를 서버에 요청함. */
@@ -161,12 +193,21 @@ export default {
         })
         this.profile()
 
-        return
+        return {
+          success: true,
+          detail: data
+        }
       } else {
-        throw new Error(response.status)
+        this.onAuthError({
+          success: false,
+          detail: data
+        })
       }
     } catch (e) {
-      this.onAuthError(e)
+      this.onAuthError({
+        success: false,
+        detail: e
+      })
     }
   },
 
@@ -201,11 +242,8 @@ export default {
       } else {
         let status = Number(response.status)
         if (status == 401) {
-          var {
-            message,
-            email
-          } = await response.json()
-          if(message == 'user-not-activated') {
+          var { message, email } = await response.json()
+          if (message == 'user-not-activated' || message == 'user-locked') {
             this.onActivateRequired({
               email
             })
