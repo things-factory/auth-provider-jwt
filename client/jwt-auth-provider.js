@@ -202,6 +202,12 @@ export default {
           detail: data
         }
       } else {
+        if (data.message == 'user-not-activated') {
+          this.onActivateRequired({
+            email: formProps.email
+          })
+        }
+
         this.onAuthError({
           success: false,
           detail: data
@@ -246,7 +252,7 @@ export default {
         let status = Number(response.status)
         if (status == 401) {
           var { message, email } = await response.json()
-          if (message == 'user-not-activated' || message == 'user-locked') {
+          if (message == 'user-locked') {
             this.onActivateRequired({
               email
             })
