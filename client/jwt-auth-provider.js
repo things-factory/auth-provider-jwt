@@ -1,11 +1,3 @@
-// async function encodeSha256(password) {
-//   const encoder = new TextEncoder()
-//   const encoded = encoder.encode(password)
-
-//   const buffer = await crypto.subtle.digest('SHA-256', encoded)
-//   return hexString(buffer)
-// }
-
 function _matchPass(newPassword, confirmPassword, currentPassword) {
   if (newPassword !== confirmPassword) {
     throw 'Your password is not matched'
@@ -67,10 +59,6 @@ export default {
     try {
       _matchPass(newPassword, confirmPassword, currentPassword)
 
-      // formProps.new_pass = await encodeSha256(newPassword)
-      // formProps.confirm_pass = await encodeSha256(confirmPassword)
-      // formProps.current_pass = await encodeSha256(currentPassword)
-
       const response = await fetch(this.fullpath(`${this.changepassPath}`), {
         method: 'POST',
         credentials: 'include',
@@ -81,9 +69,8 @@ export default {
         body: JSON.stringify(formProps)
       })
 
+      const data = await response.json()
       if (response.ok) {
-        const data = await response.json()
-
         if (data && data.error) {
           this.onChangePwdError(data.error)
         } else {
@@ -143,8 +130,6 @@ export default {
       const data = await response.json()
       if (response.ok) {
         if (data && data.token) {
-          // localStorage.setItem('access_token', data.token)
-
           /*
            data.token 이 전달되면, 서버는 특별한 확인과정없이 사용자 승인한 것으로 이해하고, 바로 자동 로그인 절차에 들어간다.
            즉, 사용자 auth dispatch 후에 바로 사용자 정보를 서버에 요청한다.
@@ -153,7 +138,6 @@ export default {
             accessToken: data.token,
             domains: data.domains
           })
-          this.profile()
           return
         } else {
           this.onAuthError({
@@ -187,15 +171,14 @@ export default {
       })
 
       const data = await response.json()
+      const status = Number(response.status)
       if (response.ok) {
-        // localStorage.setItem('access_token', data.token)
-
         /* 사용자 auth dispatch 후에 바로 사용자 정보를 서버에 요청함. */
         this.onSignedIn({
           accessToken: data.token,
-          domains: data.domains
+          domains: data.domains,
+          redirectTo: data.redirectTo
         })
-        this.profile()
 
         return {
           success: true,
@@ -206,6 +189,11 @@ export default {
           this.onActivateRequired({
             email: formProps.email
           })
+        }
+
+        if (status == 406) {
+          this.onDomainNotAvailable(data)
+          return
         }
 
         this.onAuthError({
@@ -238,9 +226,6 @@ export default {
 
       const data = await response.json()
       if (response.ok) {
-        // localStorage.setItem('user', JSON.stringify(data.user))
-        // localStorage.setItem('access_token', data.token)
-
         this.onProfileFetched({
           credential: data.user,
           accessToken: data.token,
@@ -250,8 +235,8 @@ export default {
         return
       } else {
         let status = Number(response.status)
+        var { message, email } = data
         if (status == 401) {
-          var { message, email } = await response.json()
           if (message == 'user-locked') {
             this.onActivateRequired({
               email
@@ -262,9 +247,7 @@ export default {
           return
         }
         if (status == 406) {
-          response.json().then(json => {
-            this.onDomainNotAvailable(json)
-          })
+          this.onDomainNotAvailable(data)
           return
         }
         this.onAuthError({

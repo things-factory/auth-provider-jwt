@@ -11,11 +11,7 @@ export default function bootstrap() {
 
     auth.contextPath = state.app.contextPath
 
-    if (baseUrl && baseUrl !== auth.endpoint) {
-      auth.endpoint = baseUrl
-
-      auth.profile()
-    }
+    if (baseUrl && baseUrl !== auth.endpoint) auth.endpoint = baseUrl
   })
 
   auth.authProvider = JWTAuthProvider
