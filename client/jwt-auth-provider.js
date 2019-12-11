@@ -9,7 +9,7 @@ function _matchPass(newPassword, confirmPassword, currentPassword) {
 export default {
   signinPath: 'signin',
   signupPath: 'signup',
-  profilePath: 'authcheck',
+  profilePath: 'profile',
   signoutPath: 'signout',
   changepassPath: 'change_pass',
   updateProfilePath: 'update-profile',
