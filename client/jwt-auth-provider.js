@@ -80,7 +80,11 @@ export default {
         throw new Error(response.status)
       }
     } catch (e) {
-      this.onChangePwdError(e)
+      this.onChangePwdError({
+        detail: {
+          message: e
+        }
+      })
     }
   },
 
