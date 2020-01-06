@@ -1,11 +1,3 @@
-// async function encodeSha256(password) {
-//   const encoder = new TextEncoder()
-//   const encoded = encoder.encode(password)
-
-//   const buffer = await crypto.subtle.digest('SHA-256', encoded)
-//   return hexString(buffer)
-// }
-
 function _matchPass(newPassword, confirmPassword, currentPassword) {
   if (newPassword !== confirmPassword) {
     throw 'Your password is not matched'
@@ -17,11 +9,46 @@ function _matchPass(newPassword, confirmPassword, currentPassword) {
 export default {
   signinPath: 'signin',
   signupPath: 'signup',
-  profilePath: 'authcheck',
+  profilePath: 'profile',
   signoutPath: 'signout',
+  changepassPath: 'change_pass',
+  updateProfilePath: 'update-profile',
+  deleteAccountPath: 'delete-account',
   signinPage: 'signin',
   signupPage: 'signup',
-  changepassPath: 'change_pass',
+
+  //run after the base connect this provider function
+  async updateProfile(formProps) {
+    try {
+      const response = await fetch(this.fullpath(`${this.updateProfilePath}`), {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify(formProps)
+      })
+
+      const data = await response.json()
+      if (response.ok) {
+        return {
+          success: true,
+          detail: data
+        }
+      } else {
+        return {
+          success: false,
+          detail: data
+        }
+      }
+    } catch (e) {
+      return {
+        success: false,
+        detail: e
+      }
+    }
+  },
 
   //run after the base connect this provider function
   async changePassword(formProps) {
@@ -31,10 +58,6 @@ export default {
 
     try {
       _matchPass(newPassword, confirmPassword, currentPassword)
-
-      // formProps.new_pass = await encodeSha256(newPassword)
-      // formProps.confirm_pass = await encodeSha256(confirmPassword)
-      // formProps.current_pass = await encodeSha256(currentPassword)
 
       const response = await fetch(this.fullpath(`${this.changepassPath}`), {
         method: 'POST',
@@ -46,9 +69,8 @@ export default {
         body: JSON.stringify(formProps)
       })
 
+      const data = await response.json()
       if (response.ok) {
-        const data = await response.json()
-
         if (data && data.error) {
           this.onChangePwdError(data.error)
         } else {
@@ -58,7 +80,43 @@ export default {
         throw new Error(response.status)
       }
     } catch (e) {
-      this.onChangePwdError(e)
+      this.onChangePwdError({
+        detail: {
+          message: e
+        }
+      })
+    }
+  },
+
+  async deleteAccount(formProps) {
+    try {
+      const response = await fetch(this.fullpath(`${this.deleteAccountPath}`), {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify(formProps)
+      })
+
+      const data = await response.json()
+      if (response.ok) {
+        return {
+          success: true,
+          detail: data
+        }
+      } else {
+        return {
+          success: false,
+          detail: data
+        }
+      }
+    } catch (e) {
+      return {
+        success: false,
+        detail: e
+      }
     }
   },
 
@@ -73,31 +131,35 @@ export default {
         body: JSON.stringify(formProps)
       })
 
+      const data = await response.json()
       if (response.ok) {
-        const data = await response.json()
-
-        if (data && data.error) {
-          this.onAuthError(data.error)
-          return
-        }
         if (data && data.token) {
-          // localStorage.setItem('access_token', data.token)
-
           /*
            data.token 이 전달되면, 서버는 특별한 확인과정없이 사용자 승인한 것으로 이해하고, 바로 자동 로그인 절차에 들어간다.
            즉, 사용자 auth dispatch 후에 바로 사용자 정보를 서버에 요청한다.
           */
-          this.onSignedIn(data.token)
-          this.profile()
+          this.onSignedIn({
+            accessToken: data.token,
+            domains: data.domains
+          })
           return
         } else {
-          throw new Error(response.status)
+          this.onAuthError({
+            success: false,
+            detail: data
+          })
         }
       } else {
-        throw new Error(response.status)
+        this.onAuthError({
+          success: false,
+          detail: data
+        })
       }
     } catch (e) {
-      this.onAuthError(e)
+      this.onAuthError({
+        success: false,
+        detail: e
+      })
     }
   },
 
@@ -112,21 +174,42 @@ export default {
         body: JSON.stringify(formProps)
       })
 
+      const data = await response.json()
+      const status = Number(response.status)
       if (response.ok) {
-        const data = await response.json()
-
-        // localStorage.setItem('access_token', data.token)
-
         /* 사용자 auth dispatch 후에 바로 사용자 정보를 서버에 요청함. */
-        this.onSignedIn(data.token)
-        this.profile()
+        this.onSignedIn({
+          accessToken: data.token,
+          domains: data.domains,
+          redirectTo: data.redirectTo
+        })
 
-        return
+        return {
+          success: true,
+          detail: data
+        }
       } else {
-        throw new Error(response.status)
+        if (data.message == 'user-not-activated') {
+          this.onActivateRequired({
+            email: formProps.email
+          })
+        }
+
+        if (status == 406) {
+          this.onDomainNotAvailable(data)
+          return
+        }
+
+        this.onAuthError({
+          success: false,
+          detail: data
+        })
       }
     } catch (e) {
-      this.onAuthError(e)
+      this.onAuthError({
+        success: false,
+        detail: e
+      })
     }
   },
 
@@ -145,25 +228,42 @@ export default {
         headers
       })
 
+      const data = await response.json()
       if (response.ok) {
-        const data = await response.json()
-
-        // localStorage.setItem('user', JSON.stringify(data.user))
-        // localStorage.setItem('access_token', data.token)
-
-        this.onProfileFetched(data.user, data.token)
+        this.onProfileFetched({
+          credential: data.user,
+          accessToken: data.token,
+          domains: data.domains
+        })
 
         return
       } else {
         let status = Number(response.status)
+        var { message, email } = data
         if (status == 401) {
-          this.onAuthRequired(response.status)
+          if (message == 'user-locked') {
+            this.onActivateRequired({
+              email
+            })
+          } else {
+            this.onAuthRequired(response.status)
+          }
           return
         }
-        throw new Error(response)
+        if (status == 406) {
+          this.onDomainNotAvailable(data)
+          return
+        }
+        this.onAuthError({
+          success: false,
+          detail: data
+        })
       }
     } catch (e) {
-      this.onAuthError(e)
+      this.onAuthError({
+        success: false,
+        detail: e
+      })
     }
   },
 

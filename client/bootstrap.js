@@ -13,7 +13,6 @@ export default function bootstrap() {
 
     if (baseUrl && baseUrl !== auth.endpoint) {
       auth.endpoint = baseUrl
-
       auth.profile()
     }
   })
@@ -22,7 +21,7 @@ export default function bootstrap() {
 
   auth.signinPath = 'signin'
   auth.signupPath = 'signup'
-  auth.profilePath = 'authcheck'
+  auth.profilePath = 'profile'
   auth.signoutPath = 'signout'
 
   auth.signinPage = 'signin'
