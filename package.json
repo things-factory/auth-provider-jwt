@@ -1,6 +1,6 @@
 {
   "name": "@things-factory/auth-provider-jwt",
-  "version": "1.0.0-alpha.12",
+  "version": "2.0.0",
   "main": "dist-server/index.js",
   "browser": "client/index.js",
   "things-factory": true,
@@ -23,10 +23,10 @@
     "migration:revert": "node ./node_modules/typeorm/cli.js migration:revert"
   },
   "dependencies": {
-    "@things-factory/auth-base": "^1.0.0-alpha.1",
-    "@things-factory/shell": "^1.0.0-alpha.1"
+    "@things-factory/auth-base": "^2.0.0",
+    "@things-factory/shell": "^2.0.0"
   },
   "devDependencies": {
-    "@things-factory/tester": "^1.0.0-alpha.1"
+    "@things-factory/tester": "^2.0.0"
   }
 }
