@@ -23,8 +23,7 @@
     "migration:revert": "node ./node_modules/typeorm/cli.js migration:revert"
   },
   "dependencies": {
-    "@things-factory/auth-base": "^2.0.0",
-    "@things-factory/shell": "^2.0.0"
+    "@things-factory/auth-base": "^2.0.0"
   },
   "devDependencies": {
     "@things-factory/tester": "^2.0.0"
