@@ -1,6 +1,6 @@
 {
   "name": "@things-factory/auth-provider-jwt",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "main": "dist-server/index.js",
   "browser": "client/index.js",
   "things-factory": true,
@@ -27,8 +27,5 @@
   },
   "devDependencies": {
     "@things-factory/tester": "^2.0.0"
-  },
-  "resolutions": {
-    "@things-factory/auth-base": "2.0.2"
   }
 }
