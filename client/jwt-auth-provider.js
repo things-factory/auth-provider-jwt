@@ -10,6 +10,7 @@ export default {
   signinPath: 'signin',
   signupPath: 'signup',
   profilePath: 'profile',
+  checkinPath: 'checkin',
   signoutPath: 'signout',
   changepassPath: 'change_pass',
   updateProfilePath: 'update-profile',
@@ -168,15 +169,23 @@ export default {
       const response = await fetch(this.fullpath(this.signinPath), {
         method: 'POST',
         credentials: 'include',
+        // redirect: 'manual',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(formProps)
       })
 
-      const data = await response.json()
       const status = Number(response.status)
       if (response.ok) {
+        var data
+        if (response.redirected) {
+          data = {
+            redirectTo: response.url
+          }
+        } else {
+          data = await response.json()
+        }
         /* 사용자 auth dispatch 후에 바로 사용자 정보를 서버에 요청함. */
         this.onSignedIn({
           accessToken: data.token,
@@ -266,6 +275,27 @@ export default {
       })
     }
   },
+
+  async checkin(domainName) {
+    try {
+      const response = await fetch(`${this.fullpath(this.checkinPath)}/${domainName}`, {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (response.ok) {
+        if (response.redirected) return response.url
+      } else {
+        throw new Error(response.status)
+      }
+    } catch (e) {
+      this.onAuthError(e)
+    }
+  },
+
+  async goToDefaultDomain() {},
 
   async signout() {
     try {

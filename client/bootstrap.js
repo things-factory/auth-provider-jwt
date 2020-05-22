@@ -1,6 +1,5 @@
-import { store } from '@things-factory/shell'
 import { auth } from '@things-factory/auth-base'
-
+import { store } from '@things-factory/shell'
 import JWTAuthProvider from './jwt-auth-provider'
 
 export default function bootstrap() {
