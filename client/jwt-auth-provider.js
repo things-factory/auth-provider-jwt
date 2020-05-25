@@ -311,9 +311,7 @@ export default {
         const data = await response.json()
         this.onSignedOut('signed out')
         return
-      } else {
-        throw new Error(response.status)
-      }
+      } else throw new Error(response.status)
     } catch (e) {
       this.onAuthError(e)
     }
