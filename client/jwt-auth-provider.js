@@ -177,14 +177,13 @@ export default {
       })
 
       const status = Number(response.status)
+      var data
+      data = await response.json()
       if (response.ok) {
-        var data
         if (response.redirected) {
           data = {
             redirectTo: response.url
           }
-        } else {
-          data = await response.json()
         }
         /* 사용자 auth dispatch 후에 바로 사용자 정보를 서버에 요청함. */
         this.onSignedIn({
@@ -240,8 +239,7 @@ export default {
       const data = await response.json()
       if (response.ok) {
         this.onProfileFetched({
-          credential: data.user,
-          accessToken: data.token,
+          credential: data,
           domains: data.domains
         })
 
@@ -277,8 +275,10 @@ export default {
   },
 
   async checkin(domainName) {
+    let checkinURL = `${this.fullpath(this.checkinPath)}/${domainName}`
+
     try {
-      const response = await fetch(`${this.fullpath(this.checkinPath)}/${domainName}`, {
+      const response = await fetch(checkinURL, {
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
@@ -286,7 +286,8 @@ export default {
       })
 
       if (response.ok) {
-        if (response.redirected) return response.url
+        const json = await response.json()
+        return json.success
       } else {
         throw new Error(response.status)
       }
